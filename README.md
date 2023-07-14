@@ -1,2 +1,10 @@
 # OpenTask
-An open-source task manager web application
+An open-source todo web app. <a href=".">[ Demo ]</a>
+
+## Features:
+- Nested tasks.
+
+## Getting Started:
+- Run the **`npm i`** to install the required packages.
+- Run **`npm storybook`** to view the stories at [http://localhost:6006].
+- Run **`yarn start`** to start the app in development mode at [http://localhost:3000].
