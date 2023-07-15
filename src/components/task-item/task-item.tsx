@@ -36,13 +36,12 @@ export const TaskItem = ({ route, parentTask, task, onRemove, onUpdate }: Props)
                 const newTask = getNewTask('', true, parentTask.isDone)
                 onUpdate(newRoute, {...parentTask, subTasks: [...parentTask.subTasks, newTask]})
             }else{
-                const newTask = getNewTask('', true)
+                const newTask = getNewTask('', true, task.isDone)
                 onUpdate(newRoute, newTask)
             }
         }else if((e.key === 'Backspace' || e.key === 'Delete') && e.target.value === ''){
             onRemove(task)
         }
-        //todo: focus on next/previous
     }
 
     //markAllDone:
