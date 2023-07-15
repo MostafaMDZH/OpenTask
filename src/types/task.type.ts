@@ -1,6 +1,6 @@
 export type Task = {
     id: number
     value: string
-    isChecked: boolean
+    isDone: boolean
     subTasks: Task[]
 }
