@@ -1,8 +1,5 @@
 # OpenTask
-An open-source todo web app. <a href=".">[ Demo ]</a>
-
-## Features:
-- Nested tasks.
+An open-source todo web app. <a href="https://onetask.mostafa-mdzh.ir/">[ Demo ]</a>
 
 ## Getting Started:
 - Run the **`yarn install`** to install the required packages.
