@@ -6,6 +6,7 @@ export const MainWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     gap: ${props => `${props.theme.marginXL}px`};
+    padding-bottom: ${props => `${props.theme.paddingXL}px`};
 `
 
 export const HeaderWrapper = styled.div`
