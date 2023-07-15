@@ -19,7 +19,6 @@ export const TaskItem = ({ task, onValueUpdate, onCheck, onAddSubtask, onRemove 
     const { token: { fontSizeSM, colorText, colorTextDescription } } = theme.useToken()
 
     //state:
-    const [ inputRows, setInputRows ] = useState(1)
     const [ isFocused, setIsFocused ] = useState(false)
     const [ isHovered, setIsHovered ] = useState(false)
     const [ isButtonsVisible, setIsButtonsVisible ] = useState(false)
