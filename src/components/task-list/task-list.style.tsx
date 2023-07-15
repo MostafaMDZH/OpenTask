@@ -1,7 +1,9 @@
 import styled from 'styled-components'
 
 export const MainWrapper = styled.div`
-    padding-left: ${props => `${props.theme.paddingLG}px`}; //indent
+
+width: 100%;
+    padding-left: ${props => `${props.theme.paddingXS}px`};
     display: flex;
     flex-direction: column;
 `

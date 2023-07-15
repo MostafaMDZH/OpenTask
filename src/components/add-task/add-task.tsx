@@ -1,6 +1,7 @@
 import { Input, theme } from 'antd'
 import { IconContainer, MainWrapper } from './add-task.style'
 import { PlusOutlined } from '@ant-design/icons'
+import { useState } from 'react'
 
 type Props = {
     onAdd: (value: string) => void
@@ -11,6 +12,7 @@ export const AddTask = ({ onAdd }: Props) => {
     //theme:
     const { token: { fontSizeSM, colorTextDescription } } = theme.useToken()
     
+    //render:
     return (
         <MainWrapper>
 
@@ -26,6 +28,7 @@ export const AddTask = ({ onAdd }: Props) => {
 
             {/* input */}
             <Input
+                value={''}
                 bordered={false}
                 placeholder='Add task'
                 style={{ flex: 1 }}

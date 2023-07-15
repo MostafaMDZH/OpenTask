@@ -14,3 +14,7 @@ export const TaskWrapper = styled.div`
     justify-content: space-between;
     align-items: center;
 `
+
+export const TaskListContainer = styled.div`
+    padding-left: ${props => `${props.theme.paddingLG}px`}; //indent
+`

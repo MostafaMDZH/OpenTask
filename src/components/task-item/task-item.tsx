@@ -1,54 +1,70 @@
-import { Button, Checkbox, Input, theme } from 'antd'
-import { ButtonsContainer, MainWrapper, TaskWrapper } from './task-item.style'
+import { Button, Checkbox, Input, InputRef, Typography, theme } from 'antd'
+import { ButtonsContainer, MainWrapper, TaskListContainer, TaskWrapper } from './task-item.style'
 import { PlusOutlined, DownOutlined, UpOutlined, CloseOutlined } from '@ant-design/icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Task } from 'types'
 import { TaskList } from 'components/task-list/task-list'
+import { getNewTask } from 'utils'
+const { Text } = Typography
 
 type Props = {
+    route: number[]
+    parentTask: Task | null
     task: Task
-    onValueUpdate: (newValue: string) => void
-    onCheck: () => void
-    onAddSubtask: () => void
-    onRemove: () => void
+    onUpdate: (route: number[], updatedTask: Task) => void
+    onRemove: (task: Task) => void
 }
 
-export const TaskItem = ({ task, onValueUpdate, onCheck, onAddSubtask, onRemove }: Props) => {
+export const TaskItem = ({ route, parentTask, task, onRemove, onUpdate }: Props) => {
 
     //theme:
-    const { token: { fontSizeSM, colorText, colorTextDescription } } = theme.useToken()
+    const { token: { fontSizeSM, colorText, colorTextDescription, paddingSM } } = theme.useToken()
+
+    //ref:
+    const inputRef = useRef<InputRef>(null)
 
     //state:
-    const [ isFocused, setIsFocused ] = useState(false)
     const [ isHovered, setIsHovered ] = useState(false)
     const [ isButtonsVisible, setIsButtonsVisible ] = useState(false)
-    const [ isExpanded, setIsExpanded ] = useState(task.subTasks.length > 0)
 
     //handleKeyDown:
     const handleKeyDown = (e: any) => {
-        if(e.key === 'Enter'){
-            onAddSubtask()
-        }else if(e.key === 'Backspace' && e.target.value === ''){
-            onRemove()
+        if(e.key === 'Enter'){ // add task to parent
+            const newRoute = [...route]
+            newRoute.pop()
+            if(parentTask !== null){
+                const newTask = getNewTask('', true, parentTask.isDone)
+                onUpdate(newRoute, {...parentTask, subTasks: [...parentTask.subTasks, newTask]})
+            }else{
+                const newTask = getNewTask('', true)
+                onUpdate(newRoute, newTask)
+            }
+        }else if((e.key === 'Backspace' || e.key === 'Delete') && e.target.value === ''){
+            onRemove(task)
         }
+        //todo: focus on next/previous
     }
 
-    //handleBlur:
-    const handleBlur = (e: any) => {
-        setIsFocused(false)
-        onValueUpdate(e.target.value)
+    //markAllDone:
+    const markAllDone = (tasks: Task[], isDone: boolean): Task[] => {
+        const updatedTasks = tasks.map(tsk => {
+            const updatedSubTasks = markAllDone([...tsk.subTasks], isDone)
+            return { ...tsk, isDone: isDone, subTasks: updatedSubTasks }
+        })
+        return updatedTasks
     }
 
     //effect:
     useEffect(() => {
-        if(isFocused){
+        if(task.isFocused){
             setIsButtonsVisible(true)
+            inputRef.current!.focus()
         }else if(isHovered){
             setIsButtonsVisible(true)
         }else{
             setIsButtonsVisible(false)
         }
-    }, [ isFocused, isHovered ])
+    }, [ task, isHovered ])
     
     return (
         <MainWrapper>
@@ -59,20 +75,31 @@ export const TaskItem = ({ task, onValueUpdate, onCheck, onAddSubtask, onRemove 
             >
 
                 {/* checkbox */}
-                <Checkbox onChange={onCheck}/>
+                <Checkbox checked={task.isDone} onChange={e => {
+                    const updatedTask = {
+                        ...task,
+                        isDone: e.target.checked,
+                        subTasks: markAllDone(task.subTasks, e.target.checked)
+                    }
+                    onUpdate(route, updatedTask)
+                }}/>
+
+                {/* [...] */}
+                {!task.isExpanded && task.subTasks.length > 0 &&
+                <Text type='secondary' style={{ marginLeft: paddingSM, whiteSpace: 'nowrap' }}>{'[...]'}</Text>}
 
                 {/* input */}
                 <Input
+                    ref={inputRef}
                     defaultValue={task.value}
                     bordered={false}
-                    placeholder='Add task'
                     style={{
-                        flex: 1,
-                        color: task.isChecked ? colorTextDescription : colorText,
-                        textDecoration: task.isChecked ? 'line-through' : 'none'
+                        minWidth: 200,
+                        color: task.isDone ? colorTextDescription : colorText,
+                        textDecoration: task.isDone ? 'line-through' : 'none'
                     }}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={e => handleBlur(e)}
+                    onFocus={() => onUpdate(route, {...task, isFocused: true})}
+                    onBlur={e => onUpdate(route, {...task, value: e.target.value, isFocused: false})}
                     onKeyDown={e => handleKeyDown(e)}
                 />
 
@@ -85,22 +112,24 @@ export const TaskItem = ({ task, onValueUpdate, onCheck, onAddSubtask, onRemove 
                             type='text'
                             shape='circle'
                             title='Add subtasks'
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            onClick={onAddSubtask}
+                            onFocus={() => setIsButtonsVisible(true)}
+                            onBlur={() => setIsButtonsVisible(false)}
+                            onClick={() => onUpdate(route, {...task, isExpanded: true, subTasks: [...task.subTasks, getNewTask('', true, task.isDone)]})}
                             icon={<PlusOutlined style={{ fontSize: fontSizeSM, color: colorTextDescription }}/>}
-                        /> :
+                        />
+                        
+                        :
                         
                         // expand button:
                         <Button
                             type='text'
                             shape='circle'
                             title='Expand'
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            onClick={() => setIsExpanded(!isExpanded)}
+                            onFocus={() => setIsButtonsVisible(true)}
+                            onBlur={() => setIsButtonsVisible(false)}
+                            onClick={() => onUpdate(route, {...task, isExpanded: !task.isExpanded})}
                             icon={
-                                isExpanded ? <UpOutlined style={{ fontSize: fontSizeSM, color: colorTextDescription }}/> :
+                                task.isExpanded ? <UpOutlined style={{ fontSize: fontSizeSM, color: colorTextDescription }}/> :
                                 <DownOutlined style={{ fontSize: fontSizeSM, color: colorTextDescription }}/>
                             }
                         />
@@ -111,9 +140,9 @@ export const TaskItem = ({ task, onValueUpdate, onCheck, onAddSubtask, onRemove 
                         type='text'
                         shape='circle'
                         title='Remove'
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        onClick={onRemove}
+                        onFocus={() => setIsButtonsVisible(true)}
+                        onBlur={() => setIsButtonsVisible(false)}
+                        onClick={() => onRemove(task)}
                         icon={<CloseOutlined style={{ fontSize: fontSizeSM, color: colorTextDescription }}/>}
                     />
 
@@ -122,7 +151,16 @@ export const TaskItem = ({ task, onValueUpdate, onCheck, onAddSubtask, onRemove 
             </TaskWrapper>
 
             {/* sub tasks */}
-            {isExpanded && <TaskList tasks={task.subTasks}/>}
+            {task.isExpanded &&
+            <TaskListContainer>
+                <TaskList
+                    route={route}
+                    parentTask={task}
+                    tasks={task.subTasks}
+                    onRemove={onRemove}
+                    onUpdate={onUpdate}
+                />
+            </TaskListContainer>}
 
         </MainWrapper>
     )
