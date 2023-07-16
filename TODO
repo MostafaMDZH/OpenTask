@@ -1,0 +1,16 @@
+## Bug:
+- Add task doesn't hide after removing all subtasks
+
+## Featurs:
+- Multiple boards(switch with tab?)
+- Dark/light theme
+- Large/small theme
+- Date and time
+- Task log
+- Sorting
+- Dragging
+- RTL direction
+- Save
+
+## Other:
+- Remove extra dependencies
