@@ -44,6 +44,16 @@ export const TaskList = ({ route, parentTask, tasks, onRemove, onUpdate }: Props
         return { doneList , count }
     }
 
+    //handleAdd:
+    const handleAdd = (value: string) => {
+        const newTask = getNewTask(value, true)
+        if(parentTask !== null){
+            onUpdate(route, {...parentTask, subTasks: [...parentTask.subTasks, newTask]})
+        }else{
+            onUpdate(route, newTask)
+        }
+    }
+
     //list and count:
     const { doneList, count } = getTasksList(tasks, route)
     
@@ -60,14 +70,7 @@ export const TaskList = ({ route, parentTask, tasks, onRemove, onUpdate }: Props
             {doneList}
 
             {/* empty new task */}
-            <AddTask onAdd={val => {
-                const newTask = getNewTask(val, true)
-                if(parentTask !== null){
-                    onUpdate(route, {...parentTask, subTasks: [...parentTask.subTasks, newTask]})
-                }else{
-                    onUpdate(route, newTask)
-                }
-            }}/>
+            <AddTask onAdd={handleAdd}/>
 
         </MainWrapper>
     )

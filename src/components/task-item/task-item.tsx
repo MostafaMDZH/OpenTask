@@ -44,6 +44,16 @@ export const TaskItem = ({ route, parentTask, task, onRemove, onUpdate }: Props)
         }
     }
 
+    //handleUpdateDone:
+    const handleUpdateDone = (e: any) => {
+        const updatedTask = {
+            ...task,
+            isDone: e.target.checked,
+            subTasks: markAllDone(task.subTasks, e.target.checked)
+        }
+        onUpdate(route, updatedTask)
+    }
+
     //markAllDone:
     const markAllDone = (tasks: Task[], isDone: boolean): Task[] => {
         const updatedTasks = tasks.map(tsk => {
@@ -74,14 +84,7 @@ export const TaskItem = ({ route, parentTask, task, onRemove, onUpdate }: Props)
             >
 
                 {/* checkbox */}
-                <Checkbox checked={task.isDone} onChange={e => {
-                    const updatedTask = {
-                        ...task,
-                        isDone: e.target.checked,
-                        subTasks: markAllDone(task.subTasks, e.target.checked)
-                    }
-                    onUpdate(route, updatedTask)
-                }}/>
+                <Checkbox checked={task.isDone} onChange={handleUpdateDone}/>
 
                 {/* [...] */}
                 {!task.isExpanded && task.subTasks.length > 0 &&
