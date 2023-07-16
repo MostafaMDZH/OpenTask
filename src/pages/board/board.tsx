@@ -10,19 +10,6 @@ export const Board = () => {
     //state:
     const [ tasks, setTasks ] = useState(defaultTasks)
 
-    //addTask:
-    const addTask = (tasks: Task[], parentTask: Task, newTask: Task): Task[] => {
-        const updatedTasks = tasks.map(tsk => {
-            if(tsk.id === parentTask.id){
-                return { ...tsk, subTasks: [...tsk.subTasks, newTask] }
-            }else{
-                const updatedSubTasks = addTask([...tsk.subTasks], {...parentTask}, newTask)
-                return { ...tsk, subTasks: updatedSubTasks }
-            }
-        })
-        return updatedTasks
-    }
-
     //update:
     const update = (tasks: Task[], route: number[], updatedTask: Task): Task[] => {
         if(route.length === 0){
